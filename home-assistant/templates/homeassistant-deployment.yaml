@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c --volumes hostPath --out home-assistant
+    kompose.service.type: LoadBalancer
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: homeassistant
+  name: homeassistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: homeassistant
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c --volumes hostPath --out home-assistant
+        kompose.service.type: LoadBalancer
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: homeassistant
+    spec:
+      containers:
+        - image: ghcr.io/home-assistant/home-assistant:stable
+          name: homeassistant
+          ports:
+            - containerPort: 8123
+          resources: {}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              subPath: .homeassistant
+            # - mountPath: /config
+            #   name: homeassistant-hostpath0
+            - mountPath: /etc/localtime
+              name: homeassistant-hostpath1
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: ha-ssd-pv-claim
+        # - hostPath:
+        #     path: /home/pi/.homeassistant
+        #   name: homeassistant-hostpath0
+        - hostPath:
+            path: /etc/localtime
+          name: homeassistant-hostpath1
+status: {}

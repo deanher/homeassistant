@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c --volumes hostPath --out home-assistant
+    kompose.service.type: LoadBalancer
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: homeassistant-tcp
+  name: homeassistant-tcp
+spec:
+  ports:
+    - name: "8123"
+      port: 8123
+      targetPort: 8123
+  selector:
+    io.kompose.service: homeassistant
+  type: LoadBalancer
+status:
+  loadBalancer: {}
